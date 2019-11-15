@@ -6,7 +6,13 @@
   "scripts": {
     "dev": "nodemon server.js",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "commit": "git-cz"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
@@ -26,7 +32,9 @@
   },
   "devDependencies": {
     "babel-plugin-import": "^1.12.2",
-    "nodemon": "^1.19.4",
-    "husky": "^3.0.9"
+    "commitizen": "^4.0.3",
+    "cz-conventional-changelog": "^3.0.2",
+    "husky": "^3.0.9",
+    "nodemon": "^1.19.4"
   }
 }
