@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { withRouter } from "next/router";
 import Container from "./Container";
 import { logout } from "./../store/store";
+import Link from "next/link";
 
 const { Header, Content, Footer } = Layout;
 
@@ -20,7 +21,9 @@ const footerStyle = {
 };
 
 const MyLayout = ({ children, user, logout, router }) => {
-  const [search, setSearch] = useState("");
+  const urlQuery = router.query && router.query.query;
+
+  const [search, setSearch] = useState(urlQuery || "");
 
   const userMenu = () => (
     <Menu>
@@ -32,7 +35,9 @@ const MyLayout = ({ children, user, logout, router }) => {
     setSearch(event.target.value);
   }, []);
 
-  const handleOnSearch = useCallback(() => {}, []);
+  const handleOnSearch = useCallback(() => {
+    router.push(`/search?query=${search}`);
+  }, [search]);
 
   const handleLogout = useCallback(() => {
     logout();
@@ -44,7 +49,9 @@ const MyLayout = ({ children, user, logout, router }) => {
         <Container renderer={<div className="header-inner" />}>
           <div className="header-left">
             <div className="logo">
-              <Icon type="github" style={githubIconStyle} />
+              <Link href={"/"}>
+                <Icon type="github" style={githubIconStyle} />
+              </Link>
             </div>
             <div>
               <Input.Search
@@ -96,11 +103,14 @@ const MyLayout = ({ children, user, logout, router }) => {
             height: 100%;
           }
           .ant-layout {
-            height: 100%;
+            min-height: 100%;
           }
           .ant-layout-header {
             padding-left: 0;
             padding-right: 0;
+          }
+          .ant-layout-content {
+            background: #fff;
           }
         `}
       </style>
