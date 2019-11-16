@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import WithRedux from './../libs/with-redux'
 import Router from 'next/router'
 import Link from 'next/link'
+import axios from 'axios'
 
 class MyApp extends App {
 
@@ -39,6 +40,11 @@ class MyApp extends App {
         Router.events.on('routeChangeStart', this.startLoading)
         Router.events.on('routeChangeComplete', this.stopLoading)
         Router.events.on('routeChangeError', this.stopLoading)
+
+        // 获取数据
+        axios.get('/github/search/repositories?q=react').then(res => {
+            console.log(res.data)
+        })
     }
 
     componentWillUnmount() {
