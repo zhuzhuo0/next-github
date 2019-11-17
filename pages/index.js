@@ -1,14 +1,33 @@
-import { Button, Icon } from "antd";
+import { Button, Icon, Tabs } from "antd";
 import getConfig from "next/config";
 import { connect } from "react-redux";
 import Repo from "../components/Repo";
+import Router, { withRouter } from "next/router";
+import { useEffect } from "react";
 
 const { request } = require("./../libs/api");
 
 const { publicRuntimeConfig } = getConfig();
 
-const Index = ({ userRepos, userStarred, user }) => {
-  console.log(userRepos, userStarred, user);
+const isServer = typeof window === "undefined";
+
+let cachedUserRepos, cachedUserStarredRepos;
+
+const Index = ({ userRepos, userStarredRepos, user, router }) => {
+  console.log(userRepos, userStarredRepos, user);
+
+  const tabKey = router.query.key || "1";
+
+  const hanleTabChange = activeKey => {
+    Router.push(`/?key=${activeKey}`);
+  };
+
+  useEffect(() => {
+    if (!isServer) {
+      cachedUserRepos = userRepos;
+      cachedUserStarredRepos = userStarredRepos;
+    }
+  }, []);
 
   if (!user || !user.id) {
     return (
@@ -43,9 +62,18 @@ const Index = ({ userRepos, userStarred, user }) => {
         </p>
       </div>
       <div className="user-repos">
-        {userRepos.map(repo => (
-          <Repo repo={repo} />
-        ))}
+        <Tabs activeKey={tabKey} onChange={hanleTabChange} animated={false}>
+          <Tabs.TabPane tab="你的仓库" key="1">
+            {userRepos.map(repo => (
+              <Repo key={repo.id} repo={repo} />
+            ))}
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="你关注的仓库" key="2">
+            {userStarredRepos.map(repo => (
+              <Repo key={repo.id} repo={repo} />
+            ))}
+          </Tabs.TabPane>
+        </Tabs>
       </div>
       <style jsx>
         {`
@@ -94,6 +122,15 @@ Index.getInitialProps = async ({ ctx, reduxStore }) => {
     return {};
   }
 
+  if (!isServer) {
+    if (cachedUserRepos && cachedUserStarredRepos) {
+      return {
+        userRepos: cachedUserRepos,
+        userStarredRepos: cachedUserStarredRepos
+      };
+    }
+  }
+
   const userRepos = await request(
     {
       method: "GET",
@@ -102,19 +139,22 @@ Index.getInitialProps = async ({ ctx, reduxStore }) => {
     ctx.req
   );
 
-  const userStarred = await request(
+  const userStarredRepos = await request(
     {
       method: "GET",
       url: "/user/starred"
     },
     ctx.req
   );
+
   return {
     userRepos: userRepos.data,
-    userStarred: userStarred.data
+    userStarredRepos: userStarredRepos.data
   };
 };
 
-export default connect(state => {
-  return { user: state.user };
-})(Index);
+export default withRouter(
+  connect(state => {
+    return { user: state.user };
+  })(Index)
+);
