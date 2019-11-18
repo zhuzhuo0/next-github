@@ -4,6 +4,7 @@ const session = require('koa-session')
 const Router = require('koa-router')
 const koaBody = require('koa-body')
 const Redis = require('ioredis')
+const atob = require('atob')
 const RedisSessionStore = require('./server/session-store')
 
 const auth = require('./server/auth')
@@ -16,6 +17,9 @@ const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 
 const handle = app.getRequestHandler()
+
+// 设置nodejs全局增加一个atob方法
+global.atob = atob;
 
 app.prepare().then(() => {
     const server = new Koa()
