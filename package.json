@@ -7,7 +7,8 @@
     "dev": "node server.js",
     "build": "next build",
     "start": "next start",
-    "commit": "git-cz"
+    "commit": "git-cz",
+    "analyze:browser": "cross-env BUNDLE_ANALYZE=browser next build"
   },
   "config": {
     "commitizen": {
@@ -15,10 +16,12 @@
     }
   },
   "dependencies": {
+    "@zeit/next-bundle-analyzer": "^0.1.2",
     "@zeit/next-css": "^1.0.1",
     "antd": "^3.23.6",
     "atob": "^2.1.2",
     "axios": "^0.19.0",
+    "cross-env": "^6.0.3",
     "github-markdown-css": "^3.0.1",
     "ioredis": "^4.14.1",
     "koa": "^2.10.0",

@@ -1,6 +1,10 @@
 import WithRepoBasic from "../../components/with-repo-basic";
 import { request } from './../../libs/api'
-import MDRenderer from '../../components/MarkdownRender'
+import dynamic from 'next/dynamic'
+
+const MDRenderer = dynamic(() => import('../../components/MarkdownRender'), {
+  loading: () => <p>Loading</p>
+})
 
 const Detail = ({ readme }) => {
   return <MDRenderer content={readme.content} isBase64={true} />
