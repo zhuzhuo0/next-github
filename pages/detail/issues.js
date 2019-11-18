@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Avatar, Button, Select, Spin } from "antd";
 import WithRepoBasic from "../../components/with-repo-basic";
 import { request } from "../../libs/api";
@@ -7,6 +7,8 @@ import { getLastUpdated } from "../../libs/utils";
 import SearchUser from "../../components/SearchUser";
 
 const MDRenderer = dynamic(() => import("../../components/MarkdownRender"));
+
+const CACHE = {};
 
 const IssueDetail = ({ issue }) => {
   return (
@@ -61,6 +63,9 @@ const IssueItem = ({ issue }) => {
         <div className="main-info">
           <h6>
             <span>{issue.title}</span>
+            {issue.labels.map(label => (
+              <Label label={label} key={label.id} />
+            ))}
           </h6>
           <p className="sub-info">
             <span>Updated at {getLastUpdated(issue.updated_at)}</span>
@@ -103,6 +108,28 @@ const IssueItem = ({ issue }) => {
 
 const Option = Select.Option;
 
+const Label = ({ label }) => {
+  return (
+    <>
+      <span className="label" style={{ backgroundColor: `#${label.color}` }}>
+        {label.name}
+      </span>
+      <style jsx>
+        {`
+          .label {
+            display: inline-block;
+            line-height: 20px;
+            margin-left: 15px;
+            padding: 2px 10px;
+            border-radius: 3px;
+            font-size: 14px;
+          }
+        `}
+      </style>
+    </>
+  );
+};
+
 const makeQuery = (creator, state, labels) => {
   let creatorStr = creator ? `creator=${creator}` : "";
   let stateStr = state ? `state=${state}` : "";
@@ -118,12 +145,20 @@ const makeQuery = (creator, state, labels) => {
   return `?${arr.join("&")}`;
 };
 
+const isServer = typeof window === "undefined";
+
 const Issues = ({ initialIssues, labels, owner, name }) => {
   const [creator, setCreator] = useState();
   const [state, setState] = useState();
   const [label, setLabel] = useState([]);
   const [issues, setIssues] = useState(initialIssues);
   const [fetching, setFetching] = useState(false);
+
+  useEffect(() => {
+    if (!isServer) {
+      CACHE[`${owner}/${name}`] = labels;
+    }
+  }, [owner, name, labels]);
 
   const handleCreatorChange = useCallback(value => {
     setCreator(value);
@@ -223,6 +258,8 @@ Issues.getInitialProps = async ({
     req
   }
 }) => {
+  const full_name = `${owner}/${name}`;
+
   const fetchs = await Promise.all([
     await request(
       {
@@ -230,12 +267,14 @@ Issues.getInitialProps = async ({
       },
       req
     ),
-    await request(
-      {
-        url: `/repos/${owner}/${name}/labels`
-      },
-      req
-    )
+    CACHE[full_name]
+      ? Promise.resolve({ data: CACHE[full_name] })
+      : await request(
+          {
+            url: `/repos/${owner}/${name}/labels`
+          },
+          req
+        )
   ]);
 
   return {
