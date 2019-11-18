@@ -1,13 +1,9 @@
 import Link from "next/link";
 import { Icon } from "antd";
-import moment from "moment";
+import { getLastUpdated } from "../libs/utils";
 
 function getLicense(license) {
   return license ? `${license.spdx_id} license` : "";
-}
-
-function getLastUpdated(time) {
-  return moment(time).fromNow();
 }
 
 export default ({ repo }) => {
@@ -27,7 +23,9 @@ export default ({ repo }) => {
           <span className="last-updated">
             {getLastUpdated(repo.updated_at)}
           </span>
-          <span className="open-issues">{repo.open_issues_count} open issues</span>
+          <span className="open-issues">
+            {repo.open_issues_count} open issues
+          </span>
         </p>
       </div>
       <div className="lang-star">
