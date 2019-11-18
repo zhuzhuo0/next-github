@@ -20,7 +20,6 @@ const isServer = typeof window === "undefined";
 
 export default (Comp, type = "index") => {
   const withDetail = ({ repoBasic, router, ...rest }) => {
-    console.log(repoBasic);
     const query = makeQuery(router.query);
 
     useEffect(() => {

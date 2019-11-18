@@ -4,7 +4,6 @@ const { requestGithub } = require('./../libs/api')
 module.exports = (server) => {
     server.use(async (ctx, next) => {
         if (ctx.path.startsWith('/github/')) {
-            console.log(ctx.request.body)
             const session = ctx.session;
             const githubAuth = session && session.githubAuth;
             const githubPath = `${github_base_url}${ctx.url.replace('/github/', '/')}`

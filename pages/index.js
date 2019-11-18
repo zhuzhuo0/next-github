@@ -18,7 +18,6 @@ const { publicRuntimeConfig } = getConfig();
 const isServer = typeof window === "undefined";
 
 const Index = ({ userRepos, userStarredRepos, user, router }) => {
-  //   console.log(userRepos, userStarredRepos, user);
 
   const tabKey = router.query.key || "1";
 
