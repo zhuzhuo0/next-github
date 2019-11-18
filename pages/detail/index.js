@@ -1,8 +1,9 @@
 import WithRepoBasic from "../../components/with-repo-basic";
 import { request } from './../../libs/api'
+import MDRenderer from '../../components/MarkdownRender'
 
 const Detail = ({ readme }) => {
-  return <span>Detail Page</span>;
+  return <MDRenderer content={readme.content} isBase64={true} />
 };
 
 Detail.getInitialProps = async ({ ctx: { query: { owner, name }, req } }) => {
