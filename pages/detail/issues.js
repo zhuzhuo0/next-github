@@ -6,10 +6,13 @@ import dynamic from "next/dynamic";
 import { getLastUpdated } from "../../libs/utils";
 import SearchUser from "../../components/SearchUser";
 
+// markdown渲染组件
 const MDRenderer = dynamic(() => import("../../components/MarkdownRender"));
 
+// 用于缓存的对象
 const CACHE = {};
 
+// 显示issue详情
 const IssueDetail = ({ issue }) => {
   return (
     <div className="root">
@@ -34,6 +37,7 @@ const IssueDetail = ({ issue }) => {
   );
 };
 
+// 单条issue数据
 const IssueItem = ({ issue }) => {
   const [showDetail, setShowDetail] = useState(false);
 
@@ -108,6 +112,7 @@ const IssueItem = ({ issue }) => {
 
 const Option = Select.Option;
 
+// label组件
 const Label = ({ label }) => {
   return (
     <>
@@ -130,6 +135,7 @@ const Label = ({ label }) => {
   );
 };
 
+// 组装参数
 const makeQuery = (creator, state, labels) => {
   let creatorStr = creator ? `creator=${creator}` : "";
   let stateStr = state ? `state=${state}` : "";
