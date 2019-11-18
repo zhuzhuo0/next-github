@@ -2,7 +2,8 @@ import Router, { withRouter } from "next/router";
 import { Row, Col, List, Pagination } from "antd";
 import Link from "next/link";
 import Repo from "../components/Repo";
-import { isValidElement } from "react";
+import { isValidElement, useEffect } from "react";
+import { cacheArray } from '../libs/repo-basic-cache'
 
 const { request } = require("./../libs/api");
 
@@ -46,11 +47,13 @@ const selectedItemStyle = {
   fontWeight: "100"
 };
 
-const noop = () => {};
+const noop = () => { };
 
 // github搜索限制，只会返回前1000个结果，大于1000 返回500
 
 const per_page = 20;
+
+const isServer = typeof window === 'undefined'
 
 const FilterLink = ({ name, query, lang, sort, order, page }) => {
   //   const doSearch = config => {
@@ -78,10 +81,13 @@ const FilterLink = ({ name, query, lang, sort, order, page }) => {
 };
 
 const Search = ({ router, repos }) => {
-  console.log(repos);
 
   const { ...querys } = router.query;
   const { lang, sort, order, page } = router.query;
+
+  useEffect(() => {
+    if (!isServer) cacheArray(repos.items)
+  })
 
   return (
     <div className="root">
@@ -99,8 +105,8 @@ const Search = ({ router, repos }) => {
                   {selected ? (
                     <span>{item}</span>
                   ) : (
-                    <FilterLink {...querys} lang={item} name={item} />
-                  )}
+                      <FilterLink {...querys} lang={item} name={item} />
+                    )}
                 </List.Item>
               );
             }}
@@ -121,13 +127,13 @@ const Search = ({ router, repos }) => {
                   {selected ? (
                     <span>{item.name}</span>
                   ) : (
-                    <FilterLink
-                      {...querys}
-                      order={item.order || ""}
-                      sort={item.value || ""}
-                      name={item.name}
-                    />
-                  )}
+                      <FilterLink
+                        {...querys}
+                        order={item.order || ""}
+                        sort={item.value || ""}
+                        name={item.name}
+                      />
+                    )}
                 </List.Item>
               );
             }}
@@ -149,8 +155,8 @@ const Search = ({ router, repos }) => {
                   type === "page"
                     ? page
                     : type === "prev"
-                    ? page - 1
-                    : page + 1;
+                      ? page - 1
+                      : page + 1;
                 const name = type === "page" ? page : ol;
                 return <FilterLink {...querys} page={p} name={name} />;
               }}

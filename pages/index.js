@@ -5,9 +5,10 @@ import Repo from "../components/Repo";
 import Router, { withRouter } from "next/router";
 import { useEffect } from "react";
 import LRU from "lru-cache";
+import { cacheArray } from '../libs/repo-basic-cache'
 
 const cache = new LRU({
-  maxAge: 1000 * 10
+  maxAge: 1000 * 60 * 60
 });
 
 const { request } = require("./../libs/api");
@@ -35,6 +36,13 @@ const Index = ({ userRepos, userStarredRepos, user, router }) => {
       }
     }
   }, [userRepos, userStarredRepos]);
+
+  useEffect(() => {
+    if (!isServer) {
+      cacheArray(userRepos)
+      cacheArray(userStarredRepos)
+    }
+  })
 
   if (!user || !user.id) {
     return (
