@@ -48,6 +48,8 @@ const selectedItemStyle = {
 
 const noop = () => {};
 
+// github搜索限制，只会返回前1000个结果，大于1000 返回500
+
 const per_page = 20;
 
 const FilterLink = ({ name, query, lang, sort, order, page }) => {
@@ -140,7 +142,7 @@ const Search = ({ router, repos }) => {
             <Pagination
               pageSize={per_page}
               current={Number(page) || 1}
-              total={repos.total_count}
+              total={1000}
               onChange={noop}
               itemRender={(page, type, ol) => {
                 const p =
