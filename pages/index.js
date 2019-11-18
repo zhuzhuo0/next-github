@@ -4,6 +4,11 @@ import { connect } from "react-redux";
 import Repo from "../components/Repo";
 import Router, { withRouter } from "next/router";
 import { useEffect } from "react";
+import LRU from "lru-cache";
+
+const cache = new LRU({
+  maxAge: 1000 * 10
+});
 
 const { request } = require("./../libs/api");
 
@@ -11,10 +16,8 @@ const { publicRuntimeConfig } = getConfig();
 
 const isServer = typeof window === "undefined";
 
-let cachedUserRepos, cachedUserStarredRepos;
-
 const Index = ({ userRepos, userStarredRepos, user, router }) => {
-  console.log(userRepos, userStarredRepos, user);
+  //   console.log(userRepos, userStarredRepos, user);
 
   const tabKey = router.query.key || "1";
 
@@ -24,10 +27,14 @@ const Index = ({ userRepos, userStarredRepos, user, router }) => {
 
   useEffect(() => {
     if (!isServer) {
-      cachedUserRepos = userRepos;
-      cachedUserStarredRepos = userStarredRepos;
+      if (userRepos) {
+        cache.set("userRepos", userRepos);
+      }
+      if (userStarredRepos) {
+        cache.set("userStarredRepos", userStarredRepos);
+      }
     }
-  }, []);
+  }, [userRepos, userStarredRepos]);
 
   if (!user || !user.id) {
     return (
@@ -85,7 +92,7 @@ const Index = ({ userRepos, userStarredRepos, user, router }) => {
           .user-info {
             width: 200px;
             margin-right: 40px;
-            flext-shrink: 0;
+            flex-shrink: 0;
             display: flex;
             flex-direction: column;
           }
@@ -123,10 +130,10 @@ Index.getInitialProps = async ({ ctx, reduxStore }) => {
   }
 
   if (!isServer) {
-    if (cachedUserRepos && cachedUserStarredRepos) {
+    if (cache.get("userRepos") && cache.get("userStarredRepos")) {
       return {
-        userRepos: cachedUserRepos,
-        userStarredRepos: cachedUserStarredRepos
+        userRepos: cache.get("userRepos"),
+        userStarredRepos: cache.get("userStarredRepos")
       };
     }
   }
